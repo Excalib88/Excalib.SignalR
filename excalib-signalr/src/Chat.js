@@ -6,7 +6,7 @@ class Chat extends Component {
     super(props);
 
     this.state = {
-      nick: '',
+      token: '',
       message: '',
       messages: [],
       hubConnection: null,
@@ -14,18 +14,17 @@ class Chat extends Component {
   }
 
   componentDidMount = () => {
-    const nick = window.prompt('Your name:', 'John');
-
+    const token = window.prompt('Your name:', 'John');
     const hubConnection = new HubConnectionBuilder().withUrl('http://localhost:5215/chat').build();    
 
-    this.setState({ hubConnection, nick }, () => {
+    this.setState({ hubConnection, token }, () => {
       this.state.hubConnection
         .start()
         .then(() => console.log('Connection started!'))
         .catch(err => console.log('Error while establishing connection :('));
 
-      this.state.hubConnection.on('sendMessageToAllUsers', (nick, receivedMessage) => {
-        const text = `${nick}: ${receivedMessage}`;
+      this.state.hubConnection.on('sendMessageToAllUsers', (token, receivedMessage) => {
+        const text = `${token}: ${receivedMessage}`;
         const messages = this.state.messages.concat([text]);
         this.setState({ messages });
       });
@@ -34,7 +33,7 @@ class Chat extends Component {
 
   sendMessage = () => {
     this.state.hubConnection
-      .invoke('sendMessageToAllUsers', this.state.nick, this.state.message)
+      .invoke('sendMessageToAllUsers', this.state.token, this.state.message)
       .catch(err => console.error(err));
 
       this.setState({message: ''});      
